@@ -1,10 +1,10 @@
 <?php
 
-function reorder_by_magnitude(array $numbers): array {
+function reorder(array $numbers): array {
     $length = count($numbers);
 
     for($i = 0; $i < $length; $i++) {
-        $minIndex = $i
+        $minIndex = $i;
 
         for($j = $i + 1; $j < $length; $j++) {
             if(abs($numbers[$j]) < abs($numbers[$minIndex])) {
@@ -15,8 +15,11 @@ function reorder_by_magnitude(array $numbers): array {
         if ($minIndex != $i) {
             $swap = $numbers[$i];
             $numbers[$i] = $numbers[$minIndex];
-            $numbers[$minIndex] = $swap
+            $numbers[$minIndex] = $swap;
         }
     }
     return $numbers;
 }
+
+
+print_r(reorder([50,1,5,65,35,22,100,300,250]));
