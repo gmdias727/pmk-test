@@ -1,4 +1,4 @@
-USE donations;
+USE donors_db;
 
 DROP TABLE IF EXISTS donors;
 
@@ -6,21 +6,27 @@ DROP TABLE IF EXISTS payment_details;
 
 DROP TABLE IF EXISTS addresses;
 
-CREATE TABLE donors (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    cpf VARCHAR(255) NOT NULL UNIQUE,
-    telefone VARCHAR(255) NOT NULL UNIQUE,
-    birthday TIMESTAMP NOT NULL,
-    registration_date TIMESTAMP NOT NULL,
-    donation_interval ENUM ('Único', 'Bimestral', 'Semestral', 'Anual'),
-    donation_value INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS donors (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  cpf VARCHAR(14) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  birth_date DATE NOT NULL,
+  registration_date DATE NOT NULL,
+  donation_interval ENUM('Unico','Bimestral','Semestral','Anual') NOT NULL,
+  donation_value DECIMAL(10,2) NOT NULL,
+  payment_method ENUM('Debito','Credito') NOT NULL,
+  -- If payment_method=Debito
+  account_number VARCHAR(50),
+  -- If payment_method=Credito
+  card_brand VARCHAR(20),
+  card_first6 VARCHAR(6),
+  card_last4 VARCHAR(4),
+  address VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE payment_details (
+CREATE TABLE IF NOT EXISTS payment_details (
     id INT AUTO_INCREMENT PRIMARY KEY,
     donor_id INT NOT NULL,
     payment_method ENUM ('Débito', 'Crédito') NOT NULL,
@@ -43,7 +49,7 @@ CREATE TABLE payment_details (
     )
 );
 
-CREATE TABLE addresses (
+CREATE TABLE IF NOT EXISTS addresses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     donor_id INT NOT NULL,
     street VARCHAR(255) NOT NULL,
@@ -63,35 +69,3 @@ CREATE INDEX idx_donors_email ON donors (email);
 CREATE INDEX idx_donors_cpf ON donors (cpf);
 
 CREATE INDEX idx_payment_details_donor_id ON payment_details (donor_id);
-
-INSERT INTO
-    donors (
-        name,
-        email,
-        cpf,
-        telefone,
-        birthday,
-        registration_date,
-        donation_interval,
-        donation_value
-    )
-VALUES
-    (
-        'John Doe',
-        'john@example.com',
-        '12345678901',
-        '11987654321',
-        '1990-01-01',
-        NOW (),
-        'Único',
-        100
-    );
-
-INSERT INTO
-    payment_details (donor_id, payment_method, account_info)
-VALUES
-    (
-        1,
-        'Débito',
-        '{"bank": "Bank Name", "branch": "1234", "account_number": "56789-0"}'
-    );
